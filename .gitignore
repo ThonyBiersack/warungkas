@@ -49,6 +49,7 @@ app.*.map.json
 .env
 .env.*
 generate_license.dart
+local_repository
 
 # Ignore seluruh folder Backend sesuai kemauan lu
 tingtong-backend/
