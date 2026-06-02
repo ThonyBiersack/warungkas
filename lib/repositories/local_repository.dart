@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -12,6 +12,36 @@ import 'app_repository.dart';
 
 class LocalRepository implements AppRepository {
   static Database? _db;
+
+  static const _publicKeyHex = '82446a691d91a8f3e2ece89228ae8a560d5bdf1e2cd5e5460f57f1a836f189a2';
+
+  static Future<bool> _verifyEd25519({
+    required String data,
+    required String signatureHex,
+  }) async {
+    try {
+      final algorithm = Ed25519();
+      final pubKeyBytes = _hexDecode(_publicKeyHex);
+      final publicKey = SimplePublicKey(pubKeyBytes, type: KeyPairType.ed25519);
+      final sigBytes = _hexDecode(signatureHex);
+      final signature = Signature(sigBytes, publicKey: publicKey);
+      final messageBytes = utf8.encode(data);
+      return await algorithm.verify(
+        messageBytes,
+        signature: signature,
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static List<int> _hexDecode(String hex) {
+    final bytes = <int>[];
+    for (var i = 0; i < hex.length; i += 2) {
+      bytes.add(int.parse(hex.substring(i, i + 2), radix: 16));
+    }
+    return bytes;
+  }
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -467,7 +497,7 @@ class LocalRepository implements AppRepository {
     final isTrialActive = now.isBefore(trialEndsAt);
     final trialDaysRemaining = isTrialActive ? trialEndsAt.difference(now).inDays : 0;
 
-    // ── Step 6: Validate license key (unchanged logic) ────────────────────────
+    // ── Step 6: Validate license key ────────────────────────
     bool isValid = false;
     DateTime? licenseExpiry;
     bool isLifetime = false;
@@ -480,10 +510,11 @@ class LocalRepository implements AppRepository {
         final signature = parts[2];
         final expectedShort = deviceCode.replaceFirst('WAK-', '');
         if (licShortCode == expectedShort) {
-          final hmac = Hmac(sha256, utf8.encode('WARUNGKAS_POS_OFFLINE_SECRET_2026_ABC'));
-          final digest = hmac.convert(utf8.encode('$deviceCode|$expiryB36'));
-          final expectedSig = digest.toString().substring(0, 8).toUpperCase();
-          if (signature == expectedSig) {
+          final isSignatureValid = await _verifyEd25519(
+            data: '$deviceCode|$expiryB36',
+            signatureHex: signature.toLowerCase(),
+          );
+          if (isSignatureValid) {
             final expiryTimestamp = int.tryParse(expiryB36, radix: 36) ?? 0;
             if (expiryTimestamp == 0 || now.millisecondsSinceEpoch <= expiryTimestamp) {
               isValid = true;
@@ -518,11 +549,12 @@ class LocalRepository implements AppRepository {
     final parts = licenseKey.trim().toUpperCase().split('-');
     if (parts.length != 3) throw Exception('License key tidak valid');
     
-    final hmac = Hmac(sha256, utf8.encode('WARUNGKAS_POS_OFFLINE_SECRET_2026_ABC'));
-    final digest = hmac.convert(utf8.encode('$deviceCode|${parts[1]}'));
-    final expectedSig = digest.toString().substring(0, 8).toUpperCase();
+    final isSignatureValid = await _verifyEd25519(
+      data: '$deviceCode|${parts[1]}',
+      signatureHex: parts[2].toLowerCase(),
+    );
     
-    if (parts[2] != expectedSig || parts[0] != deviceCode.replaceFirst('WAK-', '')) {
+    if (!isSignatureValid || parts[0] != deviceCode.replaceFirst('WAK-', '')) {
       throw Exception('License key tidak valid atau salah perangkat');
     }
     
