@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏪 WarungKas — Aplikasi Kasir & Manajemen Warung
 
 > Aplikasi kasir dan manajemen keuangan untuk UMKM/warung, dibangun dengan Flutter. Dirancang ringan, offline-first, dan siap pakai tanpa koneksi internet.
@@ -9,6 +10,10 @@
 ![License](https://img.shields.io/badge/License-Private-red?style=flat)
 
 ---
+### 📥 Download Aplikasi
+
+[![Download ARM64](https://img.shields.io/badge/Download-ARM64_APK-green?style=for-the-badge&logo=android)](https://github.com/ThonyBiersack/warungkas/releases/download/retail-app/app-arm64-v8a-release.apk) 
+[![Download x86_64](https://img.shields.io/badge/Download-x86__64_APK-blue?style=for-the-badge&logo=android)](https://github.com/ThonyBiersack/warungkas/releases/download/retail-app/app-x86_64-release.apk)
 
 ## 📱 Tentang Aplikasi
 
@@ -149,3 +154,6 @@ Aplikasi ini dirancang untuk:
 
 Project ini bersifat privat. Seluruh hak cipta dimiliki oleh developer.
 Dilarang mendistribusikan atau memodifikasi tanpa izin tertulis.
+=======
+# warungkas-web
+>>>>>>> 6577b0a872359df18f99474022caf941c50f59aa

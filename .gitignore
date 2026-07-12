@@ -28,8 +28,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
 /coverage/
+/build/
 
 # Symbolication & Obfuscation
 app.*.symbols
