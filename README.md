@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🏪 WarungKas — Aplikasi Kasir & Manajemen Warung
 
 > Aplikasi kasir dan manajemen keuangan untuk UMKM/warung, dibangun dengan Flutter. Dirancang ringan, offline-first, dan siap pakai tanpa koneksi internet.
@@ -155,5 +154,3 @@ Aplikasi ini dirancang untuk:
 Project ini bersifat privat. Seluruh hak cipta dimiliki oleh developer.
 Dilarang mendistribusikan atau memodifikasi tanpa izin tertulis.
 =======
-# warungkas-web
->>>>>>> 6577b0a872359df18f99474022caf941c50f59aa
